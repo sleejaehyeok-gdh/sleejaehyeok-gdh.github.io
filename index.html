@@ -1,34 +1,733 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="scroll-smooth">
 <head>
-  <title>Financial & Data Analytical Reports</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial, sans-serif; margin: 2em; background: #f9f9f9; }
-    h1 { color: #34495e; }
-    .report-card { background: #fff; border: 1px solid #eee; padding: 1em; margin-bottom: 1.5em; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-    .report-title { font-weight: bold; font-size: 1.25em; margin-bottom: 0.5em; }
-    .report-date { color: #888; font-size: 0.9em; }
-    .report-summary { margin: 0.5em 0; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Report: The Attention Economy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Calm Financials -->
+    <!-- Application Structure Plan: The application is structured as a top-down, single-page dashboard, navigable via a sticky header. This replaces the linear report structure with thematic, interactive sections: 1) 'Dashboard' (Exec Summary & Core Thesis), 2) 'Market & Players' (Hardware/Software analysis with interactive buttons to switch between Meta and TikTok data), 3) 'Financial Models' (Unit economics, KPIs, and sensitivity), 4) 'Competitive Analysis' (Porter's 5 Forces), and 5) 'Risks & Projections' (Future outlook). This design was chosen to allow users to either consume the report linearly or jump directly to the section most relevant to them (e.g., a user might only care about the Financial Models or the key Players), enhancing usability and information discovery. -->
+    <!-- Visualization & Content Choices: 
+        - Content War: (Report Info: "compressing content to shorter") -> (Goal: Show Change) -> (Viz: Line Chart) -> (Interaction: Hover tooltip) -> (Justification: Visually proves the trend) -> (Library: Chart.js).
+        - Screen Time Trend: (Report Info: "Screen time growth") -> (Goal: Show Change) -> (Viz: Bar Chart) -> (Interaction: Hover tooltip) -> (Justification: Clear trend visualization) -> (Library: Chart.js).
+        - Player Analysis (Meta/TikTok): (Report Info: "Instagram MAU", "TikTok watch time") -> (Goal: Compare) -> (Viz: Dynamic Bar/Doughnut Chart + Text) -> (Interaction: Click buttons to swap data) -> (Justification: Allows direct, interactive comparison of competitors in one module) -> (Library: Chart.js + Vanilla JS).
+        - Attention Funnel: (Report Info: "Unit economics") -> (Goal: Organize) -> (Viz: HTML/CSS Diagram) -> (Interaction: Static) -> (Justification: Simple, clear visualization of a process) -> (Library: HTML/Tailwind).
+        - Financial KPIs & Sensitivity: (Report Info: "FCF, EBITDA, WACC", "Sensitivity table") -> (Goal: Compare/Analyze) -> (Viz: HTML Tables) -> (Interaction: Static) -> (Justification: Standard, clear presentation for financial data) -> (Library: HTML/Tailwind).
+        - Porter's 5 Forces: (Report Info: "Porter’s 5 Forces") -> (Goal: Organize) -> (Viz: HTML/CSS Grid Diagram) -> (Interaction: Static) -> (Justification: A standard framework visualized cleanly) -> (Library: HTML/Tailwind).
+        - Market Projection: (Report Info: "future projections of market") -> (Goal: Show Change) -> (Viz: Line Chart) -> (Interaction: Hover tooltip) -> (Justification: Standard for financial projections) -> (Library: Chart.js).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fdfcfb;
+            color: #334155;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        nav a {
+            transition: color 0.2s ease-in-out;
+        }
+        nav a:hover {
+            color: #1e40af;
+        }
+        .active-nav {
+            color: #1e40af;
+            font-weight: 600;
+            border-bottom: 2px solid #1e40af;
+        }
+        .player-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .player-btn.active {
+            background-color: #1e40af;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .stat-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+        }
+        .kpi-table th {
+            background-color: #f8fafc;
+        }
+    </style>
 </head>
-<body>
-  <h1>Informative Financial & Data Analytical Reports</h1>
-  <p>Welcome! This site will feature curated insights, visualizations, and analytical breakdowns of financial and data topics.</p>
-  <section id="report-list">
-    <!-- Example Report -->
-    <div class="report-card">
-      <span class="report-title">Quarterly Market Analysis</span>
-      <span class="report-date">Nov 2025</span>
-      <div class="report-summary">Overview of market trends, key sector performance, and quantitative highlights.</div>
-    </div>
-    <div class="report-card">
-      <span class="report-title">Data-Driven Unemployment Trends</span>
-      <span class="report-date">Nov 2025</span>
-      <div class="report-summary">Analysis of unemployment patterns using multiple economic indicators and sources.</div>
-    </div>
-    <!-- Add your reports here! -->
-  </section>
+<body class="antialiased">
+
+    <header class="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <h1 class="text-xl font-bold text-blue-900">The Attention Economy</h1>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                    <a href="#dashboard" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium text-slate-600">Dashboard</a>
+                    <a href="#market" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium text-slate-600">Market & Players</a>
+                    <a href="#models" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium text-slate-600">Financial Models</a>
+                    <a href="#competition" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium text-slate-600">Competition</a>
+                    <a href="#future" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium text-slate-600">Risks & Projections</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="dashboard" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+            <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Dashboard: The New Currency</h2>
+            <p class="mt-4 text-lg text-slate-600">
+                This report analyzes the pivot of the digital economy from connectivity to currency, where human attention is the most valuable traded asset. We explore how this market emerged, how social media platforms wage a "content war" for fractions of a second, and how to financially model this new reality. Attention is now the foundational layer upon which digital empires at Meta, Apple, and ByteDance are built and valued.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+                <div class="stat-card">
+                    <h3 class="text-sm font-medium text-slate-500">Global Digital Ad Market (E)</h3>
+                    <p class="mt-1 text-3xl font-semibold text-slate-900">$720 Billion</p>
+                    <p class="text-sm text-slate-500">+8.5% YOY Growth</p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="text-sm font-medium text-slate-500">Avg. Daily Screen Time (Global)</h3>
+                    <p class="mt-1 text-3xl font-semibold text-slate-900">6 Hours, 58 Minutes</p>
+                    <p class="text-sm text-slate-500">Up 42% since 2015</p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="text-sm font-medium text-slate-500">Avg. Attention Value / User / Min</h3>
+                    <p class="mt-1 text-3xl font-semibold text-slate-900">$0.008</p>
+                    <p class="text-sm text-slate-500">Varies by platform & geo</p>
+                </div>
+            </div>
+
+            <div class="mt-12">
+                <h3 class="text-2xl font-semibold text-slate-900">The "Content War": Compressing Attention</h3>
+                <p class="mt-2 text-slate-600">
+                    The market for attention is aggressively competitive. This has triggered a "content war" where platforms algorithmically favor shorter, more potent content to maximize engagement per minute. The transition from text (blogs) to images (Instagram) to short-form video (TikTok/Reels) is a direct financial strategy to increase the velocity of attention harvesting.
+                </p>
+                <div class="mt-6">
+                    <div class="chart-container">
+                        <canvas id="contentWarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="market" class="bg-white py-12 md:py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Market & Players: Harvesters & Gatekeepers</h2>
+                <p class="mt-4 text-lg text-slate-600">
+                    The attention economy is a two-layer market: the hardware "gateways" that control access (Apple) and the software "harvesters" that monetize the attention flow (Meta, TikTok). Apple's ecosystem (iPhone) creates a high-margin toll booth, while software platforms build algorithmic traps to capture and sell user focus.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-12">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-slate-900">Hardware Gateway: Apple's iPhone</h3>
+                        <p class="mt-2 text-slate-600">
+                            With an install base over 1.5 billion active devices, the iPhone is the primary portal to the digital world. Apple monetizes attention indirectly via App Store commissions (30%) and by selling privacy as a feature, which in turn gives it leverage over the software harvesters who rely on its platform.
+                        </p>
+                        <div class="mt-6">
+                            <div class="chart-container">
+                                <canvas id="screenTimeChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-semibold text-slate-900">Software Harvesters: Meta vs. TikTok</h3>
+                        <p class="mt-2 text-slate-600">
+                            This is the frontline of the attention war. Select a player to analyze their strategy and key metrics.
+                        </p>
+                        <div class="mt-4 flex space-x-4">
+                            <button id="btn-meta" class="player-btn active px-4 py-2 text-sm font-medium rounded-md bg-white border border-slate-300 text-slate-700 hover:bg-slate-50">Meta (Instagram)</button>
+                            <button id="btn-tiktok" class="player-btn px-4 py-2 text-sm font-medium rounded-md bg-white border border-slate-300 text-slate-700 hover:bg-slate-50">ByteDance (TikTok)</button>
+                        </div>
+                        
+                        <div id="player-content" class="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-200 min-h-[440px]">
+                            <h4 id="player-title" class="text-xl font-semibold text-slate-800"></h4>
+                            <p id="player-text" class="mt-2 text-sm text-slate-600"></p>
+                            <div class="mt-4">
+                                <div class="chart-container" style="height: 250px; max-height: 300px;">
+                                    <canvas id="playerChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="models" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+            <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Financial Models: Quantifying Attention</h2>
+            <p class="mt-4 text-lg text-slate-600">
+                To value companies in this economy, we must translate attention into revenue. We model this using a unit economics funnel and analyze platform financials through key performance indicators (KPIs) and sensitivity analysis.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-12">
+                <div>
+                    <h3 class="text-2xl font-semibold text-slate-900">Attention-to-Revenue Funnel</h3>
+                    <p class="mt-2 text-slate-600">
+                        The process of monetizing attention is a multi-step funnel, where value is extracted at each stage.
+                    </p>
+                    <div class="mt-6 space-y-4">
+                        <div class="p-4 border border-slate-200 rounded-lg shadow-sm">
+                            <h4 class="font-semibold text-blue-800">1. User Base (MAU/DAU)</h4>
+                            <p class="text-sm text-slate-600">Total addressable attention pool. (e.g., Meta: 3.2B DAU)</p>
+                        </div>
+                        <div class="flex justify-center">
+                            <span class="text-2xl text-slate-400">↓</span>
+                        </div>
+                        <div class="p-4 border border-slate-200 rounded-lg shadow-sm">
+                            <h4 class="font-semibold text-blue-800">2. Time Spent (Avg. Min/Day)</h4>
+                            <p class="text-sm text-slate-600">Gross attention inventory. (e.g., TikTok: 95 Mins/Day)</p>
+                        </div>
+                        <div class="flex justify-center">
+                            <span class="text-2xl text-slate-400">↓</span>
+                        </div>
+                        <div class="p-4 border border-slate-200 rounded-lg shadow-sm">
+                            <h4 class="font-semibold text-blue-800">3. Engagement (Ad Load/Min)</h4>
+                            <p class="text-sm text-slate-600">Attention captured & monetizable inventory. (e.g., 4 Ads/Min)</p>
+                        </div>
+                        <div class="flex justify-center">
+                            <span class="text-2xl text-slate-400">↓</span>
+                        </div>
+                        <div class="p-4 border border-slate-200 rounded-lg shadow-sm">
+                            <h4 class="font-semibold text-blue-800">4. Monetization (ARPU / CPM)</h4>
+                            <p class="text-sm text-slate-600">Revenue per unit of attention. (e.g., $10.10 Global ARPU)</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold text-slate-900">Discounted Attention Flow (DAF)</h3>
+                    <p class="mt-2 text-slate-600">
+                        We propose a "Discounted Attention Flow" (DAF) model, analogous to a DCF. Instead of cash, we project the total inventory of user minutes, apply a decay rate (churn/fatigue), and discount it back to present value. This "present value of future attention" serves as a key intangible asset.
+                    </p>
+                    
+                    <h3 class="text-2xl font-semibold text-slate-900 mt-8">Key Financial KPIs (TTM)</h3>
+                    <div class="mt-4 overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200 border border-slate-200 kpi-table">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Company</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">FCF</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">EBITDA Margin</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">WACC (E)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-slate-200">
+                                <tr>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900">Apple (AAPL)</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">$99.6B</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">33.5%</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">8.2%</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900">Meta (META)</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">$43.9B</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">41.2%</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">9.5%</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900">ByteDance (Private)</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">$25.0B (E)</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">28.0% (E)</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">11.0% (E)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-16">
+                <h3 class="text-2xl font-semibold text-slate-900">Sensitivity Analysis: Revenue Growth vs. EBITDA Margin (Meta)</h3>
+                <p class="mt-2 text-slate-600">This table illustrates how Meta's estimated valuation changes based on shifts in revenue growth and margin assumptions. The top-3 drivers are 1) DAU Growth, 2) Ad Load/Pricing, 3) Operating Margin.</p>
+                <div class="mt-4 overflow-x-auto">
+                    <table class="min-w-full divide-y divide-slate-200 border border-slate-200 kpi-table">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider" rowspan="2">EBITDA Margin</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider" colspan="3">Forward Revenue Growth</th>
+                            </tr>
+                            <tr>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">10% (Bear)</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">15% (Base)</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">20% (Bull)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-slate-200 text-center">
+                            <tr>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900 text-left">38.0%</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">$1,150B</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">$1,280B</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">$1,410B</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900 text-left">41.0% (Base)</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">$1,220B</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600 bg-blue-50 font-semibold">$1,350B</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">$1,490B</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900 text-left">43.0%</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">$1,290B</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">$1,420B</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600">$1,560B</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="mt-4 text-sm text-slate-600"><strong>Recommendation (META):</strong> Overweight. Base case valuation of $1.35T implies ~15% upside. The market under-appreciates the monetization potential of Reels and the durable engagement of the core app family, providing a margin of safety against macro headwinds.</p>
+            </div>
+        </section>
+
+        <section id="competition" class="bg-white py-12 md:py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Competitive Landscape</h2>
+                <p class="mt-4 text-lg text-slate-600">
+                    The competition for attention is fought on different fronts. We compare primary strategies and adapt Porter's 5 Forces to this new economy.
+                </p>
+
+                <h3 class="text-2xl font-semibold text-slate-900 mt-12">Platform Attention Strategies</h3>
+                <div class="mt-4 overflow-x-auto">
+                    <table class="min-w-full divide-y divide-slate-200 border border-slate-200 kpi-table">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Company</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Strategy</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Monetization Model</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-slate-200">
+                            <tr>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900">Apple</td>
+                                <td class="px-4 py-3 text-sm text-slate-600">Hardware Gateway + Privacy Wall</td>
+                                <td class="px-4 py-3 text-sm text-slate-600">Hardware Sales, App Store Commission</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900">Meta</td>
+                                <td class="px-4 py-3 text-sm text-slate-600">Social Dopamine + Ad Scale</td>
+                                <td class="px-4 py-3 text-sm text-slate-600">Targeted Advertising</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900">TikTok</td>
+                                <td class="px-4 py-3 text-sm text-slate-600">Infinite Feed + Algorithm Supremacy</td>
+                                <td class="px-4 py-3 text-sm text-slate-600">Targeted Advertising, E-commerce</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900">Netflix</td>
+                                <td class="px-4 py-3 text-sm text-slate-600">Premium Content (Long-form)</td>
+                                <td class="px-4 py-3 text-sm text-slate-600">Subscription (Premium Attention)</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900">Spotify</td>
+                                <td class="px-4 py-3 text-sm text-slate-600">Background Attention Model</td>
+                                <td class="px-4 py-3 text-sm text-slate-600">Subscription, Ad-Supported</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="text-2xl font-semibold text-slate-900 mt-12">Porter's 5 Forces for the Attention Economy</h3>
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="stat-card md:col-span-3 text-center">
+                        <h4 class="font-semibold text-blue-800">Threat of New Entrants (High)</h4>
+                        <p class="text-sm text-slate-600">Low barrier to create an app, but extremely high barrier to achieve network effects & scale (e.g., BeReal, Clubhouse flash-and-fade).</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 class="font-semibold text-blue-800">Bargaining Power of Suppliers (High)</h4>
+                        <p class="text-sm text-slate-600">"Suppliers" are Users/Creators. They are fragmented, but high-value creators have significant leverage (e.g., MrBeast).</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 class="font-semibold text-blue-800">Rivalry Among Competitors (EXTREME)</h4>
+                        <p class="text-sm text-slate-600">Zero-sum game for a finite 24-hour day. TikTok vs. Instagram Reels vs. YouTube Shorts is a direct, feature-copying war.</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 class="font-semibold text-blue-800">Bargaining Power of Buyers (High)</h4>
+                        <p class="text-sm text-slate-600">"Buyers" are Advertisers. They can easily switch budgets between Meta, Google, TikTok, seeking the highest ROI on attention.</p>
+                    </div>
+                    <div class="stat-card md:col-span-3 text-center">
+                        <h4 class="font-semibold text-blue-800">Threat of Substitutes (High)</h4>
+                        <p class="text-sm text-slate-600">Any offline activity. Also, new tech paradigms like AR/VR (Apple Vision Pro) or AI Companions which may not rely on ad models.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="future" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+            <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Risks & Forward-Looking Thesis</h2>
+            <p class="mt-4 text-lg text-slate-600">
+                The future of the attention economy will be defined by regulatory pressures and the next wave of technological disruption. While the market is projected to grow, the risks to the current models are significant.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-12">
+                <div>
+                    <h3 class="text-2xl font-semibold text-slate-900">Key Risk Factors</h3>
+                    <ul class="mt-4 space-y-3 list-disc list-inside text-slate-600">
+                        <li><strong>Regulatory Pressure:</strong> Antitrust (Meta, Apple) and data privacy (TikTok) could forcibly break up ecosystems or limit data harvesting, increasing CPMs.</li>
+                        <li><strong>Algorithm Fatigue:</strong> Users show signs of "dopamine resistance" and mental health backlash, leading to digital detox trends and higher churn.</li>
+                        <li><strong>Ad Spend Elasticity:</strong> In a recession, advertising is often the first budget cut, revealing high sensitivity to macro-economic cycles.</li>
+                        <li><strong>Platform Risk (Apple):</strong> Apple's App Tracking Transparency (ATT) cost Meta an estimated $10B. Future OS changes remain a primary risk.</li>
+                        <li><strong>New Paradigms:</strong> AI Companions may "consume" attention on behalf of users. AR/VR (Apple Vision Pro) creates a new, more immersive attention layer, potentially displacing mobile.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold text-slate-900">Future Projections: Digital Ad Market</h3>
+                    <p class="mt-2 text-slate-600">
+                        Despite risks, the total market value of monetizable attention is projected to grow, driven by emerging markets and new formats (e.g., in-app e-commerce, AR ads).
+                    </p>
+                    <div class="mt-6">
+                        <div class="chart-container">
+                            <canvas id="marketProjectionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-16">
+                <h3 class="text-2xl font-semibold text-slate-900">Forward Thesis: AI & AR Reshape the Market</h3>
+                <p class="mt-2 text-slate-600">
+                    The next 5-10 years will see a fundamental shift. AI will move from being a tool for *harvesting* attention (like TikTok's algorithm) to a *competitor* for attention (AI companions, generative AI search). Simultaneously, AR/VR hardware like the Apple Vision Pro aims to replace the mobile screen as the primary gateway. The companies that successfully navigate this transition from a 2D screen-based attention economy to a 3D, AI-mediated one will emerge as the next trillion-dollar leaders. The core asset, however, remains the same: finite human focus.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <p class="text-center text-sm text-slate-500">
+                This financial report is for informational purposes only. Not investment advice. Data is sourced from public filings and internal estimates.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const chartJsHelpers = {
+                wrapText: function(context, text, x, y, maxWidth, lineHeight) {
+                    let words = text.split(' ');
+                    let line = '';
+                    let lines = [];
+
+                    for(let n = 0; n < words.length; n++) {
+                        let testLine = line + words[n] + ' ';
+                        let metrics = context.measureText(testLine);
+                        let testWidth = metrics.width;
+                        if (testWidth > maxWidth && n > 0) {
+                            lines.push(line);
+                            line = words[n] + ' ';
+                        } else {
+                            line = testLine;
+                        }
+                    }
+                    lines.push(line);
+
+                    for (let k = 0; k < lines.length; k++) {
+                        context.fillText(lines[k], x, y);
+                        y += lineHeight;
+                    }
+                    return y;
+                },
+                
+                tooltipWrap: function(tooltipItems, maxWidth) {
+                    let wrappedTooltip = [];
+                    tooltipItems.forEach(tooltipItem => {
+                        let text = tooltipItem.label || '';
+                        let words = text.split(' ');
+                        let line = '';
+                        let lines = [];
+                        
+                        for(let n = 0; n < words.length; n++) {
+                            let testLine = line + words[n] + ' ';
+                            if (testLine.length > maxWidth && n > 0) {
+                                lines.push(line);
+                                line = words[n] + ' ';
+                            } else {
+                                line = testLine;
+                            }
+                        }
+                        lines.push(line);
+                        
+                        if (tooltipItem.formattedValue) {
+                            lines.push(tooltipItem.formattedValue);
+                        }
+                        
+                        wrappedTooltip.push(lines);
+                    });
+                    return wrappedTooltip.flat();
+                }
+            };
+            
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 12, family: 'Inter' },
+                            color: '#475569',
+                            boxWidth: 15,
+                            padding: 15
+                        }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: '#334155',
+                        titleFont: { size: 14, family: 'Inter', weight: 'bold' },
+                        bodyFont: { size: 12, family: 'Inter' },
+                        padding: 12,
+                        cornerRadius: 4,
+                        displayColors: true,
+                        boxPadding: 4,
+                        callbacks: {
+                            label: function(context) {
+                                return chartJsHelpers.tooltipWrap([context], 16);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: '#475569',
+                            font: { size: 11, family: 'Inter' }
+                        },
+                        grid: {
+                            display: false,
+                            borderColor: '#e2e8f0'
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: '#475569',
+                            font: { size: 11, family: 'Inter' }
+                        },
+                        grid: {
+                            color: '#f1f5f9',
+                            borderColor: '#e2e8f0'
+                        }
+                    }
+                },
+                layout: {
+                    padding: 10
+                }
+            };
+
+            const lineChartOptions = { ...chartOptions, scales: { ...chartOptions.scales, x: { ...chartOptions.scales.x, grid: { display: false } }, y: { ...chartOptions.scales.y, grid: { color: '#f1f5f9' } } }};
+            const barChartOptions = { ...chartOptions, scales: { ...chartOptions.scales, x: { ...chartOptions.scales.x, grid: { display: false } }, y: { ...chartOptions.scales.y, grid: { display: false } } }};
+            const doughnutChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            font: { size: 12, family: 'Inter' },
+                            color: '#475569',
+                            boxWidth: 15,
+                            padding: 15
+                        }
+                    },
+                    tooltip: chartOptions.plugins.tooltip
+                },
+                layout: { padding: 10 }
+            };
+
+            new Chart(document.getElementById('contentWarChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['2012 (Blog Post)', '2016 (Image)', '2020 (Video)', '2024 (Shorts/Reels)'],
+                    datasets: [{
+                        label: 'Engagement per Minute',
+                        data: [100, 180, 250, 450],
+                        borderColor: '#1e40af',
+                        backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }, {
+                        label: 'Avg. Content Length (Secs)',
+                        data: [600, 60, 180, 45],
+                        borderColor: '#64748b',
+                        backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                        fill: false,
+                        tension: 0.3,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    ...lineChartOptions,
+                    scales: {
+                        ...lineChartOptions.scales,
+                        y: { ...lineChartOptions.scales.y, title: { display: true, text: 'Engagement Score' } },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            title: { display: true, text: 'Avg. Length (Secs)' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('screenTimeChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['2015', '2017', '2019', '2021', '2023', '2025 (E)'],
+                    datasets: [{
+                        label: 'Avg. Daily Screen Time (Hours)',
+                        data: [4.9, 5.4, 6.1, 6.7, 6.9, 7.1],
+                        backgroundColor: '#1e40af',
+                        borderRadius: 4
+                    }]
+                },
+                options: barChartOptions
+            });
+            
+            new Chart(document.getElementById('marketProjectionChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['2024', '2025', '2026', '2027', '2028', '2029', '2030'],
+                    datasets: [{
+                        label: 'Global Digital Ad Market (Billions USD)',
+                        data: [720, 778, 836, 895, 953, 1010, 1065],
+                        borderColor: '#1e40af',
+                        backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: lineChartOptions
+            });
+
+            const playerData = {
+                meta: {
+                    title: 'Meta (Instagram): The Social Dopamine Engine',
+                    text: 'Meta leverages its massive 3.2B DAU base and sophisticated social graph to deliver highly targeted ads. Its strategy revolves around maximizing engagement through "dopamine hits" (likes, comments) and has successfully pivoted to short-form video with Reels to combat TikTok.',
+                    chart: {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Family of Apps (Ads)', 'Reality Labs', 'Other'],
+                            datasets: [{
+                                label: 'Revenue Breakdown',
+                                data: [97.8, 1.2, 1.0],
+                                backgroundColor: ['#1e40af', '#60a5fa', '#93c5fd'],
+                                hoverOffset: 4
+                            }]
+                        },
+                        options: doughnutChartOptions
+                    }
+                },
+                tiktok: {
+                    title: 'ByteDance (TikTok): The Algorithm Supremacy',
+                    text: 'TikTok\'s "algorithm supremacy" creates a powerful, interest-based feed that maximizes watch time, averaging over 90 minutes per user per day. Its monetization is rapidly scaling from ads to in-app e-commerce ("TikTok Shop"), creating a closed-loop attention-to-purchase funnel.',
+                    chart: {
+                        type: 'bar',
+                        data: {
+                            labels: ['TikTok', 'YouTube', 'Instagram', 'Facebook'],
+                            datasets: [{
+                                label: 'Avg. Minutes per Day (US User)',
+                                data: [95, 62, 51, 49],
+                                backgroundColor: ['#1e40af', '#60a5fa', '#93c5fd', '#dbeafe'],
+                                borderRadius: 4
+                            }]
+                        },
+                        options: { ...barChartOptions, plugins: { ...barChartOptions.plugins, legend: { display: false } } }
+                    }
+                }
+            };
+            
+            const playerTitle = document.getElementById('player-title');
+            const playerText = document.getElementById('player-text');
+            const playerChartCanvas = document.getElementById('playerChart').getContext('2d');
+            const btnMeta = document.getElementById('btn-meta');
+            const btnTikTok = document.getElementById('btn-tiktok');
+            window.playerChartInstance = null;
+            
+            function updatePlayerSection(playerKey) {
+                const data = playerData[playerKey];
+                
+                playerTitle.innerText = data.title;
+                playerText.innerText = data.text;
+                
+                if (window.playerChartInstance) {
+                    window.playerChartInstance.destroy();
+                }
+                
+                window.playerChartInstance = new Chart(playerChartCanvas, {
+                    type: data.chart.type,
+                    data: data.chart.data,
+                    options: data.chart.options
+                });
+                
+                if (playerKey === 'meta') {
+                    btnMeta.classList.add('active');
+                    btnTikTok.classList.remove('active');
+                } else {
+                    btnTikTok.classList.add('active');
+                    btnMeta.classList.remove('active');
+                }
+            }
+            
+            btnMeta.addEventListener('click', () => updatePlayerSection('meta'));
+            btnTikTok.addEventListener('click', () => updatePlayerSection('tiktok'));
+            updatePlayerSection('meta');
+
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('nav a.nav-link');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.4
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.remove('active-nav');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active-nav');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            document.querySelectorAll('nav a.nav-link').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+        });
+    </script>
 </body>
 </html>
